@@ -298,8 +298,13 @@
     .then(data => {
       document.getElementById('update-bar').innerHTML =
         'Last updated: <strong>' + timeAgo(data.last_updated) + '</strong>';
-      document.getElementById('grid').innerHTML =
-        Object.values(data.mountains).map(buildCard).join('');
+      const mountains = Object.values(data.mountains).sort((a, b) => {
+        const aOpen = (a.status || '').toLowerCase() === 'open';
+        const bOpen = (b.status || '').toLowerCase() === 'open';
+        if (aOpen !== bOpen) return aOpen ? -1 : 1;
+        return a.name.localeCompare(b.name);
+      });
+      document.getElementById('grid').innerHTML = mountains.map(buildCard).join('');
     })
     .catch(() => {
       document.getElementById('grid').innerHTML = `
