@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-17T20:03:49+00:00",
+  "last_updated": "2026-04-17T23:10:30+00:00",
   "mountains": {
     "black_mountain": {
       "name": "Black Mountain",
@@ -101,7 +101,7 @@
       "name": "Loon Mountain",
       "location": "Lincoln, NH",
       "url": "https://www.loonmtn.com/mountain-report",
-      "status": "Open",
+      "status": "Closed",
       "base_depth": "12-24\"",
       "new_snow_24h": "0\"",
       "season_total": "N/A",
