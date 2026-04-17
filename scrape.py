@@ -260,7 +260,7 @@ def scrape_black_mountain():
         d["base_depth"]   = find_first([r'base\s*(?:depth)?[:\s]*([\d\.]+)["\s]', r'([\d\.]+)["\s]+base'], text, suffix='"')
         d["new_snow_24h"] = find_first([r'24.?hour[:\s]*([\d\.]+)["\s]', r'new\s+snow[:\s]*([\d\.]+)["\s]'], text, suffix='"')
         d["season_total"] = find_first([r'season\s+total[:\s]*([\d\.]+)["\s]'], text, suffix='"')
-        d["surface"]      = find_first([r'surface\s+conditions?[:\s]+([^\n\.]{5,60})'], text)
+        d["surface"]      = find_first([r'surface\s+conditions?[:\s]+((?:packed|groomed|loose|wet|icy|spring|corn|powder|variable|crusty|machine|smooth|soft)[^\n\.]{0,50})'], text)
         d["temperature"]  = find_first([r'(\d{1,3})\s*°?\s*F'], text, suffix='°F')
 
         m = re.search(r'(\d+)\s+of\s+(\d+)\s+trails?\s+open', text, re.IGNORECASE)
