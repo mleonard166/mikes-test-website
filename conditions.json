@@ -1,0 +1,37 @@
+{
+  "last_updated": "2026-04-17T12:00:00+00:00",
+  "mountains": {
+    "black_mountain": {
+      "name": "Black Mountain",
+      "location": "Jackson, NH",
+      "url": "https://www.blackmt.com/conditions",
+      "status": "Open",
+      "base_depth": "30+\"",
+      "new_snow_24h": "0\"",
+      "season_total": "134\"",
+      "trails_open": "7",
+      "trails_total": "47",
+      "lifts_open": "2",
+      "lifts_total": "4",
+      "surface": "Smooth and Soft",
+      "temperature": "68°F",
+      "error": null
+    },
+    "cranmore": {
+      "name": "Cranmore Mountain",
+      "location": "North Conway, NH",
+      "url": "https://cranmore.com/snow-report",
+      "status": "Closed",
+      "base_depth": "N/A",
+      "new_snow_24h": "0\"",
+      "season_total": "93\"",
+      "trails_open": "0",
+      "trails_total": "62",
+      "lifts_open": "0",
+      "lifts_total": "7",
+      "surface": "Season Closed",
+      "temperature": "N/A",
+      "error": null
+    }
+  }
+}

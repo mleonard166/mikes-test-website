@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mike's NH Ski Report</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⛷️</text></svg>" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
+      background: linear-gradient(160deg, #09192e 0%, #0e2a4a 40%, #0a1f38 100%);
+      min-height: 100vh;
+      color: #fff;
+    }
+
+    /* ---------- HEADER ---------- */
+    header {
+      text-align: center;
+      padding: 48px 20px 28px;
+    }
+    header h1 {
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    header .subtitle {
+      color: #88b8d8;
+      font-size: 1rem;
+      letter-spacing: 0.5px;
+    }
+    #update-bar {
+      margin-top: 14px;
+      font-size: 0.82rem;
+      color: #5a90b4;
+    }
+    #update-bar strong { color: #88b8d8; }
+
+    /* ---------- GRID ---------- */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto 56px;
+      padding: 0 20px;
+    }
+
+    /* ---------- CARD ---------- */
+    .card {
+      background: rgba(255,255,255,0.055);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 22px;
+      padding: 28px 26px 22px;
+      backdrop-filter: blur(12px);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+    }
+
+    /* card top row */
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 22px;
+      gap: 12px;
+    }
+    .mountain-name {
+      font-size: 1.3rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .mountain-loc {
+      font-size: 0.8rem;
+      color: #7aaac8;
+      margin-top: 3px;
+    }
+
+    /* status badge */
+    .badge {
+      flex-shrink: 0;
+      padding: 5px 14px;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .badge-open   { background: rgba(46,213,115,.18); color: #2ed573; border: 1px solid rgba(46,213,115,.35); }
+    .badge-closed { background: rgba(255,71,87,.18);  color: #ff4757; border: 1px solid rgba(255,71,87,.35); }
+    .badge-unknown{ background: rgba(255,165,2,.18);  color: #ffa502; border: 1px solid rgba(255,165,2,.35); }
+
+    /* stats grid */
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .stat {
+      background: rgba(255,255,255,0.055);
+      border-radius: 13px;
+      padding: 13px 14px;
+    }
+    .stat.wide { grid-column: 1 / -1; }
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #6090b0;
+      margin-bottom: 5px;
+    }
+    .stat-value {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1;
+    }
+    .stat.wide .stat-value { font-size: 1rem; }
+
+    /* snow bar */
+    .snow-bar-wrap { margin-top: 6px; }
+    .snow-bar-bg { background: rgba(255,255,255,0.1); border-radius: 4px; height: 6px; }
+    .snow-bar-fill { background: #5bc0f8; border-radius: 4px; height: 100%; transition: width 0.5s ease; }
+
+    /* link */
+    .card-link {
+      display: block;
+      margin-top: 18px;
+      text-align: center;
+      padding: 10px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 10px;
+      color: #88b8d8;
+      text-decoration: none;
+      font-size: 0.82rem;
+      transition: background 0.15s;
+    }
+    .card-link:hover { background: rgba(255,255,255,0.13); color: #fff; }
+
+    /* error notice */
+    .err-box {
+      margin-top: 12px;
+      background: rgba(255,71,87,0.09);
+      border: 1px solid rgba(255,71,87,0.25);
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-size: 0.75rem;
+      color: #ff7f8a;
+    }
+
+    /* ---------- FOOTER ---------- */
+    footer {
+      text-align: center;
+      padding: 0 20px 36px;
+      color: #3a6278;
+      font-size: 0.78rem;
+      line-height: 1.8;
+    }
+    footer a { color: #5a90b4; text-decoration: none; }
+    footer a:hover { color: #88b8d8; }
+
+    /* ---------- LOADING ---------- */
+    .loading-msg {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      color: #5a90b4;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>⛷️ Mike's NH Ski Report</h1>
+  <p class="subtitle">Black Mountain &nbsp;•&nbsp; Cranmore Mountain</p>
+  <div id="update-bar">Loading conditions…</div>
+</header>
+
+<div class="grid" id="grid">
+  <div class="loading-msg">Fetching ski conditions…</div>
+</div>
+
+<footer>
+  <div>Conditions refreshed automatically every 3 hours via GitHub Actions</div>
+  <div>
+    Official sites:&nbsp;
+    <a href="https://www.blackmt.com/conditions" target="_blank">blackmt.com</a>
+    &nbsp;•&nbsp;
+    <a href="https://cranmore.com/snow-report" target="_blank">cranmore.com</a>
+  </div>
+</footer>
+
+<script>
+  function timeAgo(iso) {
+    const diff = Math.floor((Date.now() - new Date(iso)) / 60000);
+    if (diff < 2)   return 'just now';
+    if (diff < 60)  return diff + ' minutes ago';
+    if (diff < 1440) return Math.floor(diff / 60) + ' hours ago';
+    return Math.floor(diff / 1440) + ' days ago';
+  }
+
+  function badgeClass(status) {
+    if (!status) return 'badge-unknown';
+    const s = status.toLowerCase();
+    if (s === 'open')   return 'badge-open';
+    if (s === 'closed') return 'badge-closed';
+    return 'badge-unknown';
+  }
+
+  function val(v) { return (v && v !== 'N/A') ? v : '—'; }
+
+  function trailsLifts(open, total) {
+    if (!open || open === 'N/A') return '—';
+    if (!total || total === 'N/A') return open;
+    return open + ' / ' + total;
+  }
+
+  function buildCard(m) {
+    const bclass = badgeClass(m.status);
+    const status = m.status || 'Unknown';
+    const errHtml = m.error
+      ? `<div class="err-box">⚠️ Some data may be missing: ${m.error}</div>`
+      : '';
+
+    // snow bar: parse base depth as a number for the bar visual
+    const baseNum = parseInt(m.base_depth) || 0;
+    const barPct = Math.min(100, Math.round(baseNum / 60 * 100));
+
+    return `
+      <div class="card">
+        <div class="card-top">
+          <div>
+            <div class="mountain-name">${m.name}</div>
+            <div class="mountain-loc">📍 ${m.location}</div>
+          </div>
+          <div class="badge ${bclass}">${status}</div>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-label">❄️ Base Depth</div>
+            <div class="stat-value">${val(m.base_depth)}</div>
+            <div class="snow-bar-wrap">
+              <div class="snow-bar-bg">
+                <div class="snow-bar-fill" style="width:${barPct}%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-label">🌨️ New Snow (24 hr)</div>
+            <div class="stat-value">${val(m.new_snow_24h)}</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-label">📊 Season Total</div>
+            <div class="stat-value">${val(m.season_total)}</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-label">🌡️ Temperature</div>
+            <div class="stat-value">${val(m.temperature)}</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-label">🎿 Trails Open</div>
+            <div class="stat-value">${trailsLifts(m.trails_open, m.trails_total)}</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-label">🚡 Lifts Open</div>
+            <div class="stat-value">${trailsLifts(m.lifts_open, m.lifts_total)}</div>
+          </div>
+
+          <div class="stat wide">
+            <div class="stat-label">🌬️ Surface Conditions</div>
+            <div class="stat-value">${val(m.surface)}</div>
+          </div>
+        </div>
+
+        ${errHtml}
+        <a class="card-link" href="${m.url}" target="_blank">View Official Site →</a>
+      </div>`;
+  }
+
+  fetch('conditions.json?v=' + Date.now())
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(data => {
+      document.getElementById('update-bar').innerHTML =
+        'Last updated: <strong>' + timeAgo(data.last_updated) + '</strong>';
+      document.getElementById('grid').innerHTML =
+        Object.values(data.mountains).map(buildCard).join('');
+    })
+    .catch(() => {
+      document.getElementById('grid').innerHTML = `
+        <div class="loading-msg">
+          ⚠️ Could not load conditions data.<br><br>
+          <a href="https://www.blackmt.com/conditions" style="color:#5a90b4">Black Mountain</a>
+          &nbsp;•&nbsp;
+          <a href="https://cranmore.com/snow-report" style="color:#5a90b4">Cranmore Mountain</a>
+        </div>`;
+      document.getElementById('update-bar').textContent = 'Error loading data';
+    });
+</script>
+
+</body>
+</html>
