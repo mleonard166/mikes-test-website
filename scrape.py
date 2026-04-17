@@ -116,6 +116,10 @@ def scrape_skinh():
                 d["lifts_open"] = m.group(1)
                 d["lifts_total"] = m.group(2)
 
+            # Derive status from counts when available
+            if d["trails_open"] not in ("N/A", None):
+                d["status"] = "Open" if int(d["trails_open"]) > 0 else "Closed"
+
             # Surface / conditions
             m = re.search(r'Conditions?[:\s]+"?([^"\n]{3,60})"?', chunk, re.IGNORECASE)
             if m:
@@ -157,6 +161,10 @@ def scrape_loon():
         m = re.search(r'(\d+)\s+of\s+(\d+)\s+lifts?\s+open', text, re.IGNORECASE)
         if m:
             d["lifts_open"], d["lifts_total"] = m.group(1), m.group(2)
+
+        # Derive status from counts — more reliable than text matching
+        if d["trails_open"] not in ("N/A", None):
+            d["status"] = "Open" if int(d["trails_open"]) > 0 else "Closed"
 
         d["base_depth"] = find_first([
             r'base\s+depth[:\s]+([\d"\'–\-]+(?:\s*[-–]\s*[\d"\']+)?)',
@@ -212,6 +220,10 @@ def scrape_sunday_river():
             m = re.search(r'(\d+)\s+of\s+(\d+)\s+lifts?\s+open', text, re.IGNORECASE)
             if m:
                 d["lifts_open"], d["lifts_total"] = m.group(1), m.group(2)
+
+            # Derive status from counts
+            if d["trails_open"] not in ("N/A", None):
+                d["status"] = "Open" if int(d["trails_open"]) > 0 else "Closed"
 
             d["base_depth"] = find_first([
                 r'base\s+(?:depth)?[:\s]*([\d"\']+)',
