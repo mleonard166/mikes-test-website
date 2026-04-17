@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-17T19:40:49+00:00",
+  "last_updated": "2026-04-17T20:00:51+00:00",
   "mountains": {
     "black_mountain": {
       "name": "Black Mountain",
@@ -14,7 +14,7 @@
       "lifts_open": "2",
       "lifts_total": "4",
       "surface": "Smooth and Soft",
-      "temperature": "68\u00b0F",
+      "temperature": "30\u00b0F",
       "error": null
     },
     "cranmore": {
@@ -78,7 +78,7 @@
       "lifts_open": "0",
       "lifts_total": "9",
       "surface": "Season Closed",
-      "temperature": "64°F",
+      "temperature": "64\u00b0F",
       "error": null
     },
     "cannon": {
@@ -94,14 +94,14 @@
       "lifts_open": "0",
       "lifts_total": "9",
       "surface": "Season Closed",
-      "temperature": "49°F",
+      "temperature": "49\u00b0F",
       "error": null
     },
     "loon": {
       "name": "Loon Mountain",
       "location": "Lincoln, NH",
       "url": "https://www.loonmtn.com/mountain-report",
-      "status": "Open",
+      "status": "Closed",
       "base_depth": "12-24\"",
       "new_snow_24h": "0\"",
       "season_total": "N/A",
@@ -109,7 +109,7 @@
       "trails_total": "73",
       "lifts_open": "3",
       "lifts_total": "14",
-      "surface": "Spring Conditions, Variable",
+      "surface": "Wet Packed",
       "temperature": "N/A",
       "error": null
     },
@@ -126,7 +126,7 @@
       "lifts_open": "1",
       "lifts_total": "19",
       "surface": "Spring Corn",
-      "temperature": "60s°F",
+      "temperature": "261\u00b0F",
       "error": null
     }
   }
