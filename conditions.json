@@ -1,12 +1,12 @@
 {
-  "last_updated": "2026-04-21T10:22:54+00:00",
+  "last_updated": "2026-04-21T14:00:00+00:00",
   "mountains": {
     "black_mountain": {
       "name": "Black Mountain",
       "location": "Jackson, NH",
       "url": "https://www.blackmt.com/conditions",
       "status": "Open",
-      "base_depth": "30+\"",
+      "base_depth": ".\"",
       "new_snow_24h": "0\"",
       "season_total": "134\"",
       "trails_open": "7",
