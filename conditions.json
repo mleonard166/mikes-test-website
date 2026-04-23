@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-23T14:02:13+00:00",
+  "last_updated": "2026-04-23T16:47:48+00:00",
   "mountains": {
     "black_mountain": {
       "name": "Black Mountain",
@@ -30,7 +30,7 @@
       "lifts_open": "0",
       "lifts_total": "7",
       "surface": "Season Closed",
-      "temperature": "N/A",
+      "temperature": "9\u00b0F",
       "error": null
     },
     "attitash": {
