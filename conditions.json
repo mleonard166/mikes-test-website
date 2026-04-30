@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-29T22:06:19+00:00",
+  "last_updated": "2026-04-30T03:49:50+00:00",
   "mountains": {
     "black_mountain": {
       "name": "Black Mountain",
@@ -31,7 +31,7 @@
       "lifts_total": "7",
       "surface": "Season Closed",
       "temperature": "9\u00b0F",
-      "error": null
+      "error": "HTTPSConnectionPool(host='cranmore.com', port=443): Max retries exceeded with url: /snow-report (Caused by NewConnectionError(\"HTTPSConnection(host='cranmore.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "attitash": {
       "name": "Attitash Mountain",
