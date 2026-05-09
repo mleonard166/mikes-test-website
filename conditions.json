@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-09T10:12:46+00:00",
+  "last_updated": "2026-05-09T13:41:28+00:00",
   "mountains": {
     "black_mountain": {
       "name": "Black Mountain",
@@ -14,7 +14,7 @@
       "lifts_open": "2",
       "lifts_total": "4",
       "surface": "Smooth and Soft",
-      "temperature": "39\u00b0F",
+      "temperature": "7\u00b0F",
       "error": null
     },
     "cranmore": {
