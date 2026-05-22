@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-22T09:40:43+00:00",
+  "last_updated": "2026-05-22T14:52:06+00:00",
   "mountains": {
     "black_mountain": {
       "name": "Black Mountain",
@@ -53,7 +53,7 @@
       "name": "Wildcat Mountain",
       "location": "Jackson, NH",
       "url": "https://www.skiwildcat.com/the-mountain/mountain-conditions/snow-and-weather-report.aspx",
-      "status": "Closed",
+      "status": "Open",
       "base_depth": "N/A",
       "new_snow_24h": "0\"",
       "season_total": "N/A",
@@ -69,7 +69,7 @@
       "name": "Bretton Woods",
       "location": "Bretton Woods, NH",
       "url": "https://www.brettonwoods.com/snow-trail-report/",
-      "status": "Closed",
+      "status": "Open",
       "base_depth": "N/A",
       "new_snow_24h": "0\"",
       "season_total": "179\"",
@@ -85,7 +85,7 @@
       "name": "Cannon Mountain",
       "location": "Franconia, NH",
       "url": "https://www.cannonmt.com/mountain-report",
-      "status": "Closed",
+      "status": "Open",
       "base_depth": "N/A",
       "new_snow_24h": "0\"",
       "season_total": "197\"",
