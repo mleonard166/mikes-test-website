@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-03T16:14:15+00:00",
+  "last_updated": "2026-09-03T20:52:22+00:00",
   "mountains": {
     "black_mountain": {
       "name": "Black Mountain",
@@ -111,7 +111,7 @@
       "lifts_total": "14",
       "surface": "Variable Conditions",
       "temperature": "N/A",
-      "error": null
+      "error": "HTTPSConnectionPool(host='globalconditionsfeed.azurewebsites.net', port=443): Read timed out. (read timeout=30)"
     },
     "sunday_river": {
       "name": "Sunday River",
