@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-04T22:56:33+00:00",
+  "last_updated": "2026-09-05T04:00:46+00:00",
   "mountains": {
     "black_mountain": {
       "name": "Black Mountain",
@@ -126,7 +126,7 @@
       "lifts_open": "1",
       "lifts_total": "19",
       "surface": "Spring Corn",
-      "temperature": "261\u00b0F",
+      "temperature": "21\u00b0F",
       "error": null
     }
   }
