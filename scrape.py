@@ -29,6 +29,17 @@ EMPTY = {
     "temperature": "N/A", "error": None,
 }
 
+# Fields that represent live operational data — never carry these forward
+# from a previous run since they go stale quickly and mislead when kept.
+OPERATIONAL_FIELDS = {"status", "trails_open", "lifts_open", "base_depth", "new_snow_24h", "surface", "temperature"}
+
+# NH/ME ski season: roughly November through April
+SKI_SEASON_MONTHS = {11, 12, 1, 2, 3, 4}
+
+
+def is_ski_season():
+    return datetime.now(timezone.utc).month in SKI_SEASON_MONTHS
+
 
 def new_record(key):
     r = dict(EMPTY)
@@ -46,6 +57,51 @@ def find_first(patterns, text, group=1, suffix=""):
         if m:
             return m.group(group).strip() + suffix
     return "N/A"
+
+
+def derive_status(d):
+    """
+    Apply consistent status logic after all fields are set.
+    Priority order (highest to lowest):
+      1. Off-season → Closed
+      2. Explicit "Season Closed" surface text → Closed
+      3. Both trails AND lifts are 0 → Closed
+      4. trails_open > 0 AND lifts_open > 0 → Open (positive evidence required)
+      5. trails_open > 0 XOR lifts_open > 0 → trust the count
+      6. status already set by scraper → keep it
+      7. fallback → Unknown
+    """
+    if not is_ski_season():
+        d["status"] = "Closed"
+        return d
+
+    if d.get("surface") and re.search(r'season\s+closed', d["surface"], re.IGNORECASE):
+        d["status"] = "Closed"
+        return d
+
+    try:
+        trails = int(d["trails_open"]) if d.get("trails_open") not in (None, "N/A") else None
+        lifts  = int(d["lifts_open"])  if d.get("lifts_open")  not in (None, "N/A") else None
+    except (ValueError, TypeError):
+        trails = lifts = None
+
+    if trails is not None and lifts is not None:
+        if trails == 0 and lifts == 0:
+            d["status"] = "Closed"
+        elif trails > 0 or lifts > 0:
+            d["status"] = "Open"
+        return d
+
+    # Only one count is available
+    if trails is not None:
+        d["status"] = "Open" if trails > 0 else "Closed"
+        return d
+    if lifts is not None:
+        d["status"] = "Open" if lifts > 0 else "Closed"
+        return d
+
+    # No counts — status stays as whatever the scraper set (Open/Closed/Unknown)
+    return d
 
 
 # ---------------------------------------------------------------------------
@@ -69,7 +125,6 @@ def scrape_skinh():
         ]
 
         # Split text into per-resort chunks using resort names as delimiters
-        # Build a regex that splits on known resort names
         all_names = [n for _, names in name_map for n in names]
         split_pat = r'(?=' + '|'.join(re.escape(n) for n in all_names) + r')'
         chunks = re.split(split_pat, text, flags=re.IGNORECASE)
@@ -88,7 +143,7 @@ def scrape_skinh():
 
             d = results[matched_key]
 
-            # Status
+            # Status — start with text signals; derive_status() will finalize
             if re.search(r'Closed\s+for\s+Snow\s+Sports|Season\s+Closed|CLOSED', chunk, re.IGNORECASE):
                 d["status"] = "Closed"
             elif re.search(r'\bOpen\b', chunk, re.IGNORECASE):
@@ -115,10 +170,6 @@ def scrape_skinh():
             if m:
                 d["lifts_open"] = m.group(1)
                 d["lifts_total"] = m.group(2)
-
-            # Derive status from counts when available
-            if d["trails_open"] not in ("N/A", None):
-                d["status"] = "Open" if int(d["trails_open"]) > 0 else "Closed"
 
             # Surface / conditions
             m = re.search(r'Conditions?[:\s]+"?([^"\n]{3,60})"?', chunk, re.IGNORECASE)
@@ -161,10 +212,6 @@ def scrape_loon():
         m = re.search(r'(\d+)\s+of\s+(\d+)\s+lifts?\s+open', text, re.IGNORECASE)
         if m:
             d["lifts_open"], d["lifts_total"] = m.group(1), m.group(2)
-
-        # Derive status from counts — more reliable than text matching
-        if d["trails_open"] not in ("N/A", None):
-            d["status"] = "Open" if int(d["trails_open"]) > 0 else "Closed"
 
         d["base_depth"] = find_first([
             r'base\s+depth[:\s]+([\d"\'–\-]+(?:\s*[-–]\s*[\d"\']+)?)',
@@ -215,15 +262,10 @@ def scrape_sunday_river():
                 m = re.search(r'(\d+)\s+of\s+(\d+)\s+trails?\s+open', text, re.IGNORECASE)
                 if m:
                     d["trails_open"], d["trails_total"] = m.group(1), m.group(2)
-                    d["status"] = "Open" if int(m.group(1)) > 0 else "Closed"
 
             m = re.search(r'(\d+)\s+of\s+(\d+)\s+lifts?\s+open', text, re.IGNORECASE)
             if m:
                 d["lifts_open"], d["lifts_total"] = m.group(1), m.group(2)
-
-            # Derive status from counts
-            if d["trails_open"] not in ("N/A", None):
-                d["status"] = "Open" if int(d["trails_open"]) > 0 else "Closed"
 
             d["base_depth"] = find_first([
                 r'base\s+(?:depth)?[:\s]*([\d"\']+)',
@@ -308,7 +350,6 @@ def scrape_cranmore():
         m = re.search(r'(\d+)\s+of\s+(\d+)\s+trails?\s+open', text, re.IGNORECASE)
         if m:
             d["trails_open"], d["trails_total"] = m.group(1), m.group(2)
-            d["status"] = "Open" if int(m.group(1)) > 0 else "Closed"
         elif re.search(r'season\s+closed', text, re.IGNORECASE):
             d["status"] = "Closed"
 
@@ -328,12 +369,25 @@ def scrape_cranmore():
 
 
 # ---------------------------------------------------------------------------
-# Merge new data over existing, preserving last-known values when N/A
+# Merge helpers
 # ---------------------------------------------------------------------------
 def merge(existing, new_data):
+    """
+    Merge new_data on top of existing, but with these rules:
+    - Static fields (name, location, url, error) always update.
+    - OPERATIONAL_FIELDS always use the fresh value, even if it's "N/A" or
+      "Unknown" — stale open/closed status from a previous season is worse
+      than showing unknown.
+    - All other fields carry forward from existing when fresh is "N/A"/"Unknown".
+    """
     merged = dict(existing)
     for k, v in new_data.items():
-        if v not in (None, "N/A", "Unknown") or k in ("error", "name", "location", "url"):
+        if k in ("error", "name", "location", "url"):
+            merged[k] = v
+        elif k in OPERATIONAL_FIELDS:
+            # Always use fresh operational data — never preserve last season's status
+            merged[k] = v
+        elif v not in (None, "N/A", "Unknown"):
             merged[k] = v
     return merged
 
@@ -349,6 +403,9 @@ def load_existing():
 if __name__ == "__main__":
     existing = load_existing()
     old = existing.get("mountains", {})
+
+    if not is_ski_season():
+        print(f"Off-season (month {datetime.now(timezone.utc).month}): skipping live scrape, all resorts marked Closed.", file=sys.stderr)
 
     # Scrape SkiNH once for all NH resorts
     print("Scraping SkiNH...", file=sys.stderr)
@@ -382,11 +439,13 @@ if __name__ == "__main__":
         "sunday_river":    sr,
     }
 
-    # Final merge: preserve last-known values from conditions.json
+    # Final merge: carry forward only non-operational fields (e.g. season_total, trails_total)
     mountains_final = {}
     for key, fresh in mountains_new.items():
         prev = old.get(key, {})
-        mountains_final[key] = merge(prev, fresh)
+        merged = merge(prev, fresh)
+        # Apply consistent status logic as the final word
+        mountains_final[key] = derive_status(merged)
 
     conditions = {
         "last_updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S+00:00"),
