@@ -100,12 +100,10 @@ def derive_status(d):
         d["status"] = "Open" if lifts > 0 else "Closed"
         return d
 
-    # No counts to corroborate — "Open" from text alone is unreliable (nav links,
-    # season pass sales, hiking, etc. all use that word). Demote to Unknown so the
-    # site doesn't claim a mountain is open for skiing without hard evidence.
-    # Text-detected "Closed" is kept: explicit closed language is more trustworthy.
-    if d.get("status") == "Open":
-        d["status"] = "Unknown"
+    # No counts to corroborate — can't prove it's open, so treat as Closed.
+    # Text-detected "Closed" is kept as-is.
+    if d.get("status") != "Closed":
+        d["status"] = "Closed"
     return d
 
 
