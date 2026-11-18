@@ -219,6 +219,16 @@
 
   function val(v) { return (v && v !== 'N/A') ? v : '—'; }
 
+  // Between May 15 and Nov 30 the season total is last season's stale number.
+  // Hide it on closed mountains during that window so it doesn't mislead.
+  function isOffSeasonWindow() {
+    const now = new Date();
+    const m = now.getMonth() + 1; // 1-12
+    const d = now.getDate();
+    // After May 15 through end of November
+    return (m === 5 && d >= 15) || (m >= 6 && m <= 11);
+  }
+
   function trailsLifts(open, total) {
     if (!open || open === 'N/A') return '—';
     if (!total || total === 'N/A') return open;
@@ -228,6 +238,8 @@
   function buildCard(m) {
     const bclass = badgeClass(m.status);
     const status = m.status || 'Unknown';
+    const isClosed = status.toLowerCase() === 'closed';
+    const showSeasonTotal = !(isClosed && isOffSeasonWindow());
     const errHtml = m.error
       ? `<div class="err-box">⚠️ Some data may be missing: ${m.error}</div>`
       : '';
@@ -262,12 +274,13 @@
             <div class="stat-value">${val(m.new_snow_24h)}</div>
           </div>
 
+          ${showSeasonTotal ? `
           <div class="stat">
             <div class="stat-label">📊 Season Total</div>
             <div class="stat-value">${val(m.season_total)}</div>
-          </div>
+          </div>` : ''}
 
-          <div class="stat">
+          <div class="stat${showSeasonTotal ? '' : ' wide'}">
             <div class="stat-label">🌡️ Temperature</div>
             <div class="stat-value">${val(m.temperature)}</div>
           </div>
