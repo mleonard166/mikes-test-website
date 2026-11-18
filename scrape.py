@@ -20,6 +20,8 @@ MOUNTAIN_DEFAULTS = {
     "cannon":          {"name": "Cannon Mountain",   "location": "Franconia, NH",     "url": "https://www.cannonmt.com/mountain-report"},
     "loon":            {"name": "Loon Mountain",     "location": "Lincoln, NH",       "url": "https://www.loonmtn.com/mountain-report"},
     "sunday_river":    {"name": "Sunday River",      "location": "Newry, ME",         "url": "https://www.sundayriver.com/mountain-report"},
+    "killington":      {"name": "Killington",        "location": "Killington, VT",    "url": "https://killington.com/mountain-report"},
+    "sugarbush":       {"name": "Sugarbush",         "location": "Warren, VT",        "url": "https://www.sugarbush.com/mountain/conditions"},
 }
 
 EMPTY = {
@@ -394,6 +396,149 @@ def scrape_cranmore():
 
 
 # ---------------------------------------------------------------------------
+# Killington (SSR page — data is in the initial HTML)
+# ---------------------------------------------------------------------------
+def scrape_killington():
+    d = new_record("killington")
+    try:
+        r = fetch("https://killington.com/mountain-report")
+        soup = BeautifulSoup(r.text, 'lxml')
+        text = soup.get_text(separator='\n', strip=True)
+
+        if re.search(r'season\s+closed|closed\s+for\s+the\s+season', text, re.IGNORECASE):
+            d["status"] = "Closed"
+
+        # Lifts: "Scheduled Lifts\n2/19" or "2/19 Scheduled Lifts"
+        m = re.search(r'Scheduled\s+Lifts\s+(\d+)/(\d+)', text, re.IGNORECASE)
+        if m:
+            d["lifts_open"], d["lifts_total"] = m.group(1), m.group(2)
+
+        # Trails: "Open Trails\n3/155"
+        m = re.search(r'Open\s+Trails\s+(\d+)/(\d+)', text, re.IGNORECASE)
+        if m:
+            d["trails_open"], d["trails_total"] = m.group(1), m.group(2)
+
+        # 24hr snow: "24 HOUR\n0\""
+        m = re.search(r'24\s+HOUR\s+(\d+)"', text, re.IGNORECASE)
+        if not m:
+            m = re.search(r'24[-\s]?hour[:\s]+([\d]+)"', text, re.IGNORECASE)
+        if m:
+            d["new_snow_24h"] = m.group(1) + '"'
+
+        # Season total: "SEASON\n5\""
+        m = re.search(r'\bSEASON\b\s+(\d+)"', text, re.IGNORECASE)
+        if m:
+            d["season_total"] = m.group(1) + '"'
+
+        # Base depth
+        m = re.search(r'Base\s+Depth[:\s]+([\d]+)"', text, re.IGNORECASE)
+        if not m:
+            m = re.search(r'([\d]+)"\s+Base', text, re.IGNORECASE)
+        if m:
+            d["base_depth"] = m.group(1) + '"'
+
+        # Temperature: appears as "40°" (no F suffix) in navbar
+        m = re.search(r'(\d{1,3})°F', text, re.IGNORECASE)
+        if not m:
+            m = re.search(r'(\d{1,3})°', text)
+        if m:
+            d["temperature"] = m.group(1) + "°F"
+
+        # Surface conditions
+        d["surface"] = find_first([
+            r'Surface\s+Conditions?[:\s]+([^\n]{5,60})',
+            r'Conditions?[:\s]+([A-Za-z ,/]+?)(?:\n|\s{2,})',
+        ], text)
+
+        print(f"Killington: status={d['status']} trails={d['trails_open']} lifts={d['lifts_open']}", file=sys.stderr)
+    except Exception as e:
+        d["error"] = str(e)
+        print(f"Killington scrape error: {e}", file=sys.stderr)
+    return d
+
+
+# ---------------------------------------------------------------------------
+# Sugarbush (Alterra — mtnpowder.com JSON API, token in page source)
+# ---------------------------------------------------------------------------
+def scrape_sugarbush():
+    d = new_record("sugarbush")
+    try:
+        # The page embeds the mtnpowder bearer token in its inline scripts / __NEXT_DATA__
+        r = fetch("https://www.sugarbush.com/mountain/conditions")
+        html = r.text
+
+        # Extract bearer token from page source
+        token_m = re.search(r'bearer_token[=&"\s:]+([A-Za-z0-9_\-\.]{20,})', html)
+        if token_m:
+            token = token_m.group(1)
+            api_url = f"https://mtnpowder.com/feed/v3.json?bearer_token={token}&resortId[]=70"
+            api_r = fetch(api_url)
+            if api_r.status_code == 200:
+                data = api_r.json()
+                resort = None
+                # v3 response is a list or has a "resorts" key
+                if isinstance(data, list):
+                    resort = data[0] if data else None
+                elif isinstance(data, dict):
+                    resorts = data.get("resorts") or data.get("data") or []
+                    resort = resorts[0] if resorts else data
+
+                if resort:
+                    cs = resort.get("CurrentConditions") or resort.get("currentConditions") or resort
+                    d["trails_open"]  = str(cs.get("OpenTrails") or cs.get("openTrails") or "N/A")
+                    d["trails_total"] = str(cs.get("TotalTrails") or cs.get("totalTrails") or "N/A")
+                    d["lifts_open"]   = str(cs.get("OpenLifts") or cs.get("openLifts") or "N/A")
+                    d["lifts_total"]  = str(cs.get("TotalLifts") or cs.get("totalLifts") or "N/A")
+                    base = cs.get("BaseDepth") or cs.get("baseDepth")
+                    if base is not None:
+                        d["base_depth"] = str(base) + '"'
+                    snow24 = cs.get("NewSnow24Hours") or cs.get("newSnow24Hours") or cs.get("SnowLast24Hours")
+                    if snow24 is not None:
+                        d["new_snow_24h"] = str(snow24) + '"'
+                    season = cs.get("SeasonTotal") or cs.get("seasonTotal") or cs.get("SnowSeasonTotal")
+                    if season is not None:
+                        d["season_total"] = str(season) + '"'
+                    temp = cs.get("Temperature") or cs.get("temperature")
+                    if temp is not None:
+                        d["temperature"] = str(temp) + "°F"
+                    surf = cs.get("SurfaceConditions") or cs.get("surfaceConditions") or cs.get("Conditions")
+                    if surf:
+                        d["surface"] = str(surf)
+                    print(f"Sugarbush API: trails={d['trails_open']} lifts={d['lifts_open']}", file=sys.stderr)
+                    return d
+            print(f"Sugarbush API returned {api_r.status_code}", file=sys.stderr)
+
+        # Fallback: parse visible text from pre-rendered HTML
+        soup = BeautifulSoup(html, 'lxml')
+        text = soup.get_text(separator='\n', strip=True)
+
+        if re.search(r'season\s+closed|closed\s+for\s+the\s+season', text, re.IGNORECASE):
+            d["status"] = "Closed"
+
+        m = re.search(r'(\d+)\s*(?:of\s*)?/\s*(\d+)\s+(?:open\s+)?trails?', text, re.IGNORECASE)
+        if not m:
+            m = re.search(r'Open\s+Trails?\s+(\d+)\s*/\s*(\d+)', text, re.IGNORECASE)
+        if m:
+            d["trails_open"], d["trails_total"] = m.group(1), m.group(2)
+
+        m = re.search(r'(\d+)\s*(?:of\s*)?/\s*(\d+)\s+(?:open\s+)?lifts?', text, re.IGNORECASE)
+        if not m:
+            m = re.search(r'Open\s+Lifts?\s+(\d+)\s*/\s*(\d+)', text, re.IGNORECASE)
+        if m:
+            d["lifts_open"], d["lifts_total"] = m.group(1), m.group(2)
+
+        m = re.search(r'(\d{1,3})°F', text)
+        if m:
+            d["temperature"] = m.group(1) + "°F"
+
+        print(f"Sugarbush fallback: status={d['status']} trails={d['trails_open']}", file=sys.stderr)
+    except Exception as e:
+        d["error"] = str(e)
+        print(f"Sugarbush scrape error: {e}", file=sys.stderr)
+    return d
+
+
+# ---------------------------------------------------------------------------
 # Merge helpers
 # ---------------------------------------------------------------------------
 def merge(existing, new_data):
@@ -453,6 +598,12 @@ if __name__ == "__main__":
     print("Scraping Sunday River...", file=sys.stderr)
     sr = scrape_sunday_river()
 
+    print("Scraping Killington...", file=sys.stderr)
+    kil = scrape_killington()
+
+    print("Scraping Sugarbush...", file=sys.stderr)
+    sug = scrape_sugarbush()
+
     mountains_new = {
         "black_mountain": bm,
         "cranmore":        cr_merged,
@@ -462,6 +613,8 @@ if __name__ == "__main__":
         "cannon":          skinh.get("cannon",    new_record("cannon")),
         "loon":            loon_merged,
         "sunday_river":    sr,
+        "killington":      kil,
+        "sugarbush":       sug,
     }
 
     # Final merge: carry forward only non-operational fields (e.g. season_total, trails_total)
