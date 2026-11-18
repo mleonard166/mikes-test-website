@@ -1,10 +1,7 @@
 {
-  "last_updated": "2026-11-18T05:10:38+00:00",
+  "last_updated": "2026-11-18T16:19:33+00:00",
   "mountains": {
     "black_mountain": {
-      "name": "Black Mountain",
-      "location": "Jackson, NH",
-      "url": "https://www.blackmt.com/conditions",
       "status": "Closed",
       "base_depth": "N/A",
       "new_snow_24h": "N/A",
@@ -15,12 +12,12 @@
       "lifts_total": "4",
       "surface": "N/A",
       "temperature": "N/A",
-      "error": null
+      "error": null,
+      "name": "Black Mountain",
+      "location": "Jackson, NH",
+      "url": "https://www.blackmt.com/conditions"
     },
     "cranmore": {
-      "name": "Cranmore Mountain",
-      "location": "North Conway, NH",
-      "url": "https://cranmore.com/snow-report",
       "status": "Closed",
       "base_depth": "N/A",
       "new_snow_24h": "N/A",
@@ -31,28 +28,28 @@
       "lifts_total": "7",
       "surface": "N/A",
       "temperature": "N/A",
-      "error": null
+      "error": null,
+      "name": "Cranmore Mountain",
+      "location": "North Conway, NH",
+      "url": "https://cranmore.com/snow-report"
     },
     "attitash": {
+      "status": "Closed",
+      "base_depth": "N/A",
+      "new_snow_24h": "N/A",
+      "season_total": "N/A",
+      "trails_open": "N/A",
+      "trails_total": "N/A",
+      "lifts_open": "N/A",
+      "lifts_total": "N/A",
+      "surface": "N/A",
+      "temperature": "N/A",
+      "error": null,
       "name": "Attitash Mountain",
       "location": "Bartlett, NH",
-      "url": "https://www.attitash.com/the-mountain/mountain-conditions/snow-and-weather-report.aspx",
-      "status": "Closed",
-      "base_depth": "N/A",
-      "new_snow_24h": "N/A",
-      "season_total": "N/A",
-      "trails_open": "N/A",
-      "trails_total": "N/A",
-      "lifts_open": "N/A",
-      "lifts_total": "N/A",
-      "surface": "N/A",
-      "temperature": "N/A",
-      "error": null
+      "url": "https://www.attitash.com/the-mountain/mountain-conditions/snow-and-weather-report.aspx"
     },
     "wildcat": {
-      "name": "Wildcat Mountain",
-      "location": "Jackson, NH",
-      "url": "https://www.skiwildcat.com/the-mountain/mountain-conditions/snow-and-weather-report.aspx",
       "status": "Closed",
       "base_depth": "N/A",
       "new_snow_24h": "N/A",
@@ -63,12 +60,12 @@
       "lifts_total": "N/A",
       "surface": "N/A",
       "temperature": "N/A",
-      "error": null
+      "error": null,
+      "name": "Wildcat Mountain",
+      "location": "Jackson, NH",
+      "url": "https://www.skiwildcat.com/the-mountain/mountain-conditions/snow-and-weather-report.aspx"
     },
     "bretton_woods": {
-      "name": "Bretton Woods",
-      "location": "Bretton Woods, NH",
-      "url": "https://www.brettonwoods.com/snow-trail-report/",
       "status": "Closed",
       "base_depth": "N/A",
       "new_snow_24h": "N/A",
@@ -79,12 +76,12 @@
       "lifts_total": "9",
       "surface": "N/A",
       "temperature": "N/A",
-      "error": null
+      "error": null,
+      "name": "Bretton Woods",
+      "location": "Bretton Woods, NH",
+      "url": "https://www.brettonwoods.com/snow-trail-report/"
     },
     "cannon": {
-      "name": "Cannon Mountain",
-      "location": "Franconia, NH",
-      "url": "https://www.cannonmt.com/mountain-report",
       "status": "Closed",
       "base_depth": "N/A",
       "new_snow_24h": "N/A",
@@ -95,12 +92,12 @@
       "lifts_total": "9",
       "surface": "N/A",
       "temperature": "N/A",
-      "error": null
+      "error": null,
+      "name": "Cannon Mountain",
+      "location": "Franconia, NH",
+      "url": "https://www.cannonmt.com/mountain-report"
     },
     "loon": {
-      "name": "Loon Mountain",
-      "location": "Lincoln, NH",
-      "url": "https://www.loonmtn.com/mountain-report",
       "status": "Closed",
       "base_depth": "N/A",
       "new_snow_24h": "N/A",
@@ -111,12 +108,12 @@
       "lifts_total": "14",
       "surface": "N/A",
       "temperature": "N/A",
-      "error": null
+      "error": null,
+      "name": "Loon Mountain",
+      "location": "Lincoln, NH",
+      "url": "https://www.loonmtn.com/mountain-report"
     },
     "sunday_river": {
-      "name": "Sunday River",
-      "location": "Newry, ME",
-      "url": "https://www.sundayriver.com/mountain-report",
       "status": "Closed",
       "base_depth": "0''",
       "new_snow_24h": "N/A",
@@ -127,7 +124,42 @@
       "lifts_total": "19",
       "surface": "N/A",
       "temperature": "N/A",
-      "error": null
+      "error": null,
+      "name": "Sunday River",
+      "location": "Newry, ME",
+      "url": "https://www.sundayriver.com/mountain-report"
+    },
+    "killington": {
+      "status": "Closed",
+      "base_depth": "N/A",
+      "new_snow_24h": "N/A",
+      "season_total": "N/A",
+      "trails_open": "N/A",
+      "trails_total": "N/A",
+      "lifts_open": "N/A",
+      "lifts_total": "N/A",
+      "surface": "N/A",
+      "temperature": "N/A",
+      "error": null,
+      "name": "Killington",
+      "location": "Killington, VT",
+      "url": "https://killington.com/mountain-report"
+    },
+    "sugarbush": {
+      "status": "Closed",
+      "base_depth": "N/A",
+      "new_snow_24h": "N/A",
+      "season_total": "N/A",
+      "trails_open": "N/A",
+      "trails_total": "N/A",
+      "lifts_open": "N/A",
+      "lifts_total": "N/A",
+      "surface": "N/A",
+      "temperature": "N/A",
+      "error": null,
+      "name": "Sugarbush",
+      "location": "Warren, VT",
+      "url": "https://www.sugarbush.com/mountain/conditions"
     }
   }
 }
