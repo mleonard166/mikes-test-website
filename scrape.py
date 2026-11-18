@@ -550,7 +550,7 @@ def merge(existing, new_data):
       than showing unknown.
     - All other fields carry forward from existing when fresh is "N/A"/"Unknown".
     """
-    merged = dict(existing)
+    merged = {**EMPTY, **existing}
     for k, v in new_data.items():
         if k in ("error", "name", "location", "url"):
             merged[k] = v
