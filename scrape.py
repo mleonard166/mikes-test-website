@@ -242,59 +242,78 @@ def scrape_loon():
 
 
 # ---------------------------------------------------------------------------
-# Sunday River
+# Sunday River — Global Conditions Feed (same system as Loon)
 # ---------------------------------------------------------------------------
 def scrape_sunday_river():
     d = new_record("sunday_river")
-    urls = [
-        "https://www.sundayriver.com/mountain-report",
-        "https://www.onthesnow.com/maine/sunday-river/skireport",
-    ]
-    for url in urls:
-        try:
-            r = fetch(url)
+
+    # Primary: Global Conditions Feed (Boyne Resorts shared backend)
+    try:
+        r = fetch("https://globalconditionsfeed.azurewebsites.net/sr/printablereports")
+        if r.status_code == 200:
             soup = BeautifulSoup(r.text, 'lxml')
             text = soup.get_text(separator=' ', strip=True)
 
-            if len(text) < 200:
-                continue
-
             if re.search(r'season\s+closed|closed\s+for\s+season', text, re.IGNORECASE):
                 d["status"] = "Closed"
-            else:
-                m = re.search(r'(\d+)\s+of\s+(\d+)\s+trails?\s+open', text, re.IGNORECASE)
-                if m:
-                    d["trails_open"], d["trails_total"] = m.group(1), m.group(2)
+            elif re.search(r'trails?\s+open|lifts?\s+open', text, re.IGNORECASE):
+                d["status"] = "Open"
+
+            m = re.search(r'(\d+)\s+of\s+(\d+)\s+trails?\s+open', text, re.IGNORECASE)
+            if m:
+                d["trails_open"], d["trails_total"] = m.group(1), m.group(2)
 
             m = re.search(r'(\d+)\s+of\s+(\d+)\s+lifts?\s+open', text, re.IGNORECASE)
             if m:
                 d["lifts_open"], d["lifts_total"] = m.group(1), m.group(2)
 
             d["base_depth"] = find_first([
-                r'base\s+(?:depth)?[:\s]*([\d"\']+)',
-                r'([\d"\']+)\s+base',
+                r'base\s+depth[:\s]+([\d"\'–\-]+(?:\s*[-–]\s*[\d"\']+)?)',
+                r'base[:\s]+([\d"\'–\-]+)',
             ], text)
 
             d["new_snow_24h"] = find_first([
-                r'24[-\s]?hr?[:\s]*([\d"\']+)',
-                r'new\s+snow[:\s]*([\d"\']+)',
+                r'24[-\s]?hour[:\s]+([\d"\']+)',
+                r'new\s+snow[:\s]+([\d"\']+)',
+            ], text)
+
+            d["surface"] = find_first([
+                r'surface\s+conditions?[:\s]+([^\n,\.]{5,60})',
+                r'conditions?[:\s]+([A-Za-z ,]+?)(?:\s*\n|\s{2,})',
             ], text)
 
             m = re.search(r'(\d{1,3})\s*°?\s*F', text, re.IGNORECASE)
             if m:
                 d["temperature"] = m.group(1) + "°F"
 
-            d["surface"] = find_first([
-                r'surface\s+conditions?[:\s]+([^\n,\.]{5,60})',
-                r'grooming[:\s]+([^\n,\.]{5,60})',
-            ], text)
+            print(f"Sunday River feed: status={d['status']} trails={d['trails_open']} lifts={d['lifts_open']}", file=sys.stderr)
+            return d
+        else:
+            print(f"Sunday River feed returned {r.status_code}, falling back.", file=sys.stderr)
+    except Exception as e:
+        print(f"Sunday River feed error: {e}", file=sys.stderr)
 
-            if d["status"] != "Unknown":
-                break
+    # Fallback: main website (JS-rendered — only closed-season text is reliable;
+    # do NOT extract temperature since the page source contains stray numbers)
+    try:
+        r = fetch("https://www.sundayriver.com/mountain-report")
+        soup = BeautifulSoup(r.text, 'lxml')
+        text = soup.get_text(separator=' ', strip=True)
 
-        except Exception as e:
-            d["error"] = str(e)
-            print(f"Sunday River scrape error ({url}): {e}", file=sys.stderr)
+        if len(text) < 200:
+            return d
+
+        if re.search(r'season\s+closed|closed\s+for\s+season', text, re.IGNORECASE):
+            d["status"] = "Closed"
+
+        # Counts are not reliably present in pre-JS HTML — skip rather than guess
+        d["surface"] = find_first([
+            r'surface\s+conditions?[:\s]+([^\n,\.]{5,60})',
+        ], text)
+
+    except Exception as e:
+        d["error"] = str(e)
+        print(f"Sunday River fallback error: {e}", file=sys.stderr)
 
     return d
 
