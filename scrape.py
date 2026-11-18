@@ -100,7 +100,12 @@ def derive_status(d):
         d["status"] = "Open" if lifts > 0 else "Closed"
         return d
 
-    # No counts — status stays as whatever the scraper set (Open/Closed/Unknown)
+    # No counts to corroborate — "Open" from text alone is unreliable (nav links,
+    # season pass sales, hiking, etc. all use that word). Demote to Unknown so the
+    # site doesn't claim a mountain is open for skiing without hard evidence.
+    # Text-detected "Closed" is kept: explicit closed language is more trustworthy.
+    if d.get("status") == "Open":
+        d["status"] = "Unknown"
     return d
 
 
@@ -308,7 +313,10 @@ def scrape_black_mountain():
 
         if re.search(r'season\s+closed|closed\s+for\s+the\s+season', text, re.IGNORECASE):
             d["status"] = "Closed"
-        elif re.search(r'open\s+today|now\s+open|top.to.bottom|trails?\s+open', text, re.IGNORECASE):
+        elif re.search(r'open\s+today|now\s+open|top.to.bottom', text, re.IGNORECASE):
+            # Note: "trails open" is intentionally excluded — it matches nav links
+            # and section headers even when nothing is actually open. Status is
+            # derived from the numeric trail/lift counts extracted below.
             d["status"] = "Open"
 
         d["base_depth"]   = find_first([r'base\s*(?:depth)?[:\s]*([\d\.]+)["\s]', r'([\d\.]+)["\s]+base'], text, suffix='"')
