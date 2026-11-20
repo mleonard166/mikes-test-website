@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-20T11:12:57+00:00",
+  "last_updated": "2026-11-20T19:53:13+00:00",
   "mountains": {
     "black_mountain": {
       "status": "Closed",
@@ -8,7 +8,7 @@
       "season_total": "134\"",
       "trails_open": "N/A",
       "trails_total": "47",
-      "lifts_open": "N/A",
+      "lifts_open": "0",
       "lifts_total": "4",
       "surface": "N/A",
       "temperature": "N/A",
