@@ -1,17 +1,17 @@
 {
-  "last_updated": "2026-11-25T08:00:09+00:00",
+  "last_updated": "2026-11-25T19:04:27+00:00",
   "mountains": {
     "black_mountain": {
-      "status": "Closed",
-      "base_depth": "N/A",
+      "status": "Open",
+      "base_depth": ".\"",
       "new_snow_24h": "N/A",
       "season_total": "134\"",
       "trails_open": "N/A",
       "trails_total": "47",
-      "lifts_open": "0",
+      "lifts_open": "1",
       "lifts_total": "4",
       "surface": "N/A",
-      "temperature": "N/A",
+      "temperature": "49\u00b0F",
       "error": null,
       "name": "Black Mountain",
       "location": "Jackson, NH",
