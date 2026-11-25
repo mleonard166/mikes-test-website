@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-24T23:49:32+00:00",
+  "last_updated": "2026-11-25T08:00:09+00:00",
   "mountains": {
     "black_mountain": {
       "status": "Closed",
@@ -28,7 +28,7 @@
       "lifts_total": "7",
       "surface": "N/A",
       "temperature": "N/A",
-      "error": "HTTPSConnectionPool(host='cranmore.com', port=443): Read timed out. (read timeout=30)",
+      "error": null,
       "name": "Cranmore Mountain",
       "location": "North Conway, NH",
       "url": "https://cranmore.com/snow-report"
