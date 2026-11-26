@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-11-26T03:26:43+00:00",
+  "last_updated": "2026-11-26T16:42:12+00:00",
   "mountains": {
     "black_mountain": {
-      "status": "Open",
-      "base_depth": ".\"",
+      "status": "Closed",
+      "base_depth": "0\"",
       "new_snow_24h": "N/A",
       "season_total": "134\"",
       "trails_open": "N/A",
       "trails_total": "47",
-      "lifts_open": "1",
+      "lifts_open": "N/A",
       "lifts_total": "4",
       "surface": "N/A",
       "temperature": "49\u00b0F",
@@ -74,7 +74,7 @@
       "trails_total": "63",
       "lifts_open": "N/A",
       "lifts_total": "9",
-      "surface": "N/A",
+      "surface": "Machine Groomed",
       "temperature": "N/A",
       "error": null,
       "name": "Bretton Woods",
