@@ -1,12 +1,12 @@
 {
-  "last_updated": "2026-11-27T11:57:11+00:00",
+  "last_updated": "2026-11-27T21:02:52+00:00",
   "mountains": {
     "black_mountain": {
       "status": "Open",
       "base_depth": "48\"",
       "new_snow_24h": "N/A",
       "season_total": "134\"",
-      "trails_open": "68",
+      "trails_open": "2",
       "trails_total": "47",
       "lifts_open": "5",
       "lifts_total": "4",
